@@ -14,6 +14,8 @@ const { registerSchema, loginSchema, noteSchema, passwordSchema, emailSchema, ro
 const { validate } = require('../middleware/validation');
 const { registerHealthRoutes } = require('../routes/health.routes');
 const { notFound, errorHandler } = require('../middleware/error-handler');
+const { pagesPath, staticPath } = require('../../../frontend/src/servers/view-paths');
+const { createViewContext } = require('../../../frontend/src/context/view-context');
 
 const app = express();
 const log = pino({ level: process.env.LOG_LEVEL || 'info', redact: ['req.headers.authorization', 'password', 'token', '*.password', '*.token'] });
@@ -22,10 +24,10 @@ if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.len
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', '..', '..', 'frontend', 'views'));
+app.set('views', pagesPath);
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, hsts: production ? undefined : false }));
 app.use(express.urlencoded({ extended: false, limit: '12kb' }));
-app.use(express.static(path.join(__dirname, '..', '..', '..', 'frontend', 'public'), { maxAge: production ? '1d' : 0, index: false }));
+app.use('/styles', express.static(staticPath, { maxAge: production ? '1d' : 0, index: false }));
 app.use(session({
   store: new pgSession({ pool, tableName: 'session', createTableIfMissing: true }),
   secret: process.env.SESSION_SECRET || 'development-only-change-me-please-32chars',
@@ -46,7 +48,7 @@ function requireAdmin(req, res, next) { if (!req.session.user || req.session.use
 function maskPhone(value) { if (!value) return 'No registrado'; const digits = value.replace(/\D/g, ''); return digits.length < 4 ? '***' : `***-***-${digits.slice(-4)}`; }
 
 app.use(csrf);
-app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; delete req.session.flash; next(); });
+app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); delete req.session.flash; next(); });
 registerHealthRoutes(app);
 app.get('/', (req, res) => res.redirect(req.session.user ? '/notes' : '/login'));
 app.get('/register', (_req, res) => res.render('register', { title: 'Crear cuenta' }));

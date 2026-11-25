@@ -23,9 +23,16 @@ backend/       # Servidor Express, base de datos, criptografía y pruebas
     servers/    # Servidor Express y conexión PostgreSQL
     validators/ # Esquemas Zod para entradas
   test/
-frontend/      # Vistas EJS y estilos CSS de la interfaz
-  views/
-  public/
+frontend/
+  src/
+    routes/     # Catálogo de rutas públicas, protegidas y administrativas
+    components/ # Componentes compartidos EJS, como header y footer
+    servers/    # Configuración de paths para el servidor de vistas y archivos estáticos
+    context/    # Contexto compartido que reciben las vistas
+    hooks/      # Base para mejoras progresivas del formulario en cliente
+    pages/      # Pantallas EJS
+    styles/     # CSS de la interfaz
+    utils/      # Formateadores reutilizables
 docs/          # Informes, investigación y guion de demostración
 ```
 
