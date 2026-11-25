@@ -21,3 +21,5 @@ services:
         sync: false
       - key: APP_ORIGIN
         sync: false
+      - key: DISPLAY_TIME_ZONE
+        value: America/Costa_Rica

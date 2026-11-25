@@ -18,6 +18,7 @@ const { notFound, errorHandler } = require('../middleware/error-handler');
 const { restrictOrigin, noStoreAuthenticatedPages } = require('../middleware/request-security');
 const { pagesPath, staticPath } = require('../../../frontend/src/servers/view-paths');
 const { createViewContext } = require('../../../frontend/src/context/view-context');
+const { formatDateTime } = require('../utils/date-time');
 
 const app = express();
 const log = pino({ level: process.env.LOG_LEVEL || 'info', redact: ['req.headers.authorization', 'password', 'token', '*.password', '*.token'] });
@@ -59,7 +60,7 @@ function maskPhone(value) { if (!value) return 'No registrado'; const digits = v
 
 app.use(csrf);
 app.use(noStoreAuthenticatedPages);
-app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); res.locals.isDevelopment = !production; delete req.session.flash; next(); });
+app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); res.locals.formatDateTime = formatDateTime; res.locals.isDevelopment = !production; delete req.session.flash; next(); });
 registerHealthRoutes(app);
 app.get('/', (req, res) => res.redirect(req.session.user ? '/notes' : '/login'));
 app.get('/register', (_req, res) => res.render('register', { title: 'Crear cuenta' }));
