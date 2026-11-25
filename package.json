@@ -9,6 +9,7 @@
     "dev": "node --watch backend/src/servers/server.js",
     "test": "node --test backend/test/crypto.test.js",
     "db:init": "node backend/src/migrations/init-db.js",
+    "db:seed": "node backend/src/migrations/seed-demo.js",
     "audit:prod": "npm audit --omit=dev --audit-level=high"
   },
   "engines": { "node": ">=22.0.0" },

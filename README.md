@@ -50,6 +50,12 @@ docs/          # Informes, investigación y guion de demostración
 4. Ejecuta `npm ci`, `npm run db:init` y `npm start`.
 5. Abre `http://localhost:3000`.
 
+### Alternativa recomendada con Docker
+
+Con Docker Desktop encendido, ejecuta `docker compose up --build`. Esto inicia PostgreSQL y SecureVault; luego abre `http://localhost:3000`. El archivo `.env` creado para desarrollo local está excluido de Git y debe reemplazarse por secretos fuertes en cualquier despliegue real.
+
+Para revisar rápidamente la interfaz local, Docker crea solo en desarrollo la cuenta `admin@umbrafiction.example` con contraseña `VaultDemo!2026`. Esta cuenta no debe existir ni usarse en producción.
+
 Variables requeridas: `DATABASE_URL`, `DATA_ENCRYPTION_KEY`, `SESSION_SECRET`, `NODE_ENV`, `PORT`, `APP_ORIGIN` y, en producción, `DATABASE_SSL=true`.
 
 Para convertir un usuario de prueba a administrador, usa el SQL, solo en tu BD de laboratorio:

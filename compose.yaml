@@ -1,0 +1,35 @@
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: securevault-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - securevault_postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: securevault-app
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      SESSION_SECRET: ${SESSION_SECRET}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY}
+      APP_ORIGIN: http://localhost:3000
+    command: sh -c "npm run db:init && npm run db:seed && npm start"
+    ports:
+      - "3000:3000"
+
+volumes:
+  securevault_postgres_data:
