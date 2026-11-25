@@ -12,7 +12,9 @@
     "db:seed": "node backend/src/migrations/seed-demo.js",
     "audit:prod": "npm audit --omit=dev --audit-level=high"
   },
-  "engines": { "node": ">=22.0.0" },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "connect-pg-simple": "^10.0.0",
@@ -22,6 +24,7 @@
     "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.1",
     "pino": "^9.5.0",
     "zod": "^4.6.7"

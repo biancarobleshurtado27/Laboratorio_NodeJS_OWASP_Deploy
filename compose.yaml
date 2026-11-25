@@ -25,6 +25,7 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       SESSION_SECRET: ${SESSION_SECRET}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY}
       APP_ORIGIN: http://localhost:3000
     command: sh -c "npm run db:init && npm run db:seed && npm start"

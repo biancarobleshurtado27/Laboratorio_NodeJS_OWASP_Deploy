@@ -34,6 +34,8 @@ Límites de negocio: título máximo 120 caracteres, nota máxima 5,000 caracter
 
 Las contraseñas no se descifran: se comparan con bcrypt de costo 12. Notas y teléfono deben recuperarse, por ello se cifran con AES-256-GCM, IV de 12 bytes nuevo por registro y tag de autenticación. El token de recuperación tiene 32 bytes aleatorios y se almacena como SHA-256 porque ya posee alta entropía.
 
+La sesión segura es el mecanismo principal de la interfaz web. Para una futura API, `POST /api/access-token` entrega a una sesión autenticada un JWT HS256 de 15 minutos; `GET /api/me` exige `Authorization: Bearer <token>`. La verificación fija algoritmo, emisor y audiencia: nunca acepta el algoritmo declarado por un cliente.
+
 Si se pierde `DATA_ENCRYPTION_KEY`, las notas y teléfonos existentes no pueden recuperarse: es un riesgo residual deliberado del cifrado fuerte. Para rotar la llave sin pérdida, la siguiente versión debe añadir `key_version` a las columnas cifradas, conservar temporalmente la llave anterior en el gestor de secretos, descifrar/re-cifrar cada registro en una migración controlada y retirar la llave vieja después de verificar copias de seguridad.
 
 ## Riesgos residuales y evidencia pendiente de producción

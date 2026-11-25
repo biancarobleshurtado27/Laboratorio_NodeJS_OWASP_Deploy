@@ -13,6 +13,7 @@ const { encrypt, decrypt, hashResetToken, newResetToken } = require('../security
 const { registerSchema, loginSchema, noteSchema, passwordSchema, emailSchema, roleSchema } = require('../validators/schemas');
 const { validate } = require('../middleware/validation');
 const { registerHealthRoutes } = require('../routes/health.routes');
+const { registerAccessTokenRoutes } = require('../routes/access-token.routes');
 const { notFound, errorHandler } = require('../middleware/error-handler');
 const { restrictOrigin, noStoreAuthenticatedPages } = require('../middleware/request-security');
 const { pagesPath, staticPath } = require('../../../frontend/src/servers/view-paths');
@@ -22,6 +23,7 @@ const app = express();
 const log = pino({ level: process.env.LOG_LEVEL || 'info', redact: ['req.headers.authorization', 'password', 'token', '*.password', '*.token'] });
 const production = process.env.NODE_ENV === 'production';
 if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) throw new Error('A 32+ character SESSION_SECRET is required in production');
+if (production && (!process.env.ACCESS_TOKEN_SECRET || process.env.ACCESS_TOKEN_SECRET.length < 32)) throw new Error('A 32+ character ACCESS_TOKEN_SECRET is required in production');
 if (production && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production');
 const appOrigin = process.env.APP_ORIGIN || `http://localhost:${process.env.PORT || 3000}`;
 app.set('trust proxy', production ? 1 : false);
@@ -79,7 +81,8 @@ app.post('/login', loginLimit, csrfGuard, validate(loginSchema), async (req, res
     await query('UPDATE users SET failed_logins=0, locked_until=NULL WHERE id=$1', [user.id]); req.session.regenerate((err) => { if (err) return next(err); req.session.user = { id: user.id, email: user.email, name: user.name, role: user.role }; audit('login_success', req, user.id).catch(next); res.redirect('/notes'); });
   } catch (error) { next(error); }
 });
-app.post('/logout', requireAuth, csrfGuard, (req, res, next) => { const id = req.session.user.id; req.session.destroy((err) => { if (err) return next(err); audit('logout', req, id).catch(() => {}); res.clearCookie('connect.sid'); res.redirect('/login'); }); });
+app.post('/logout', requireAuth, csrfGuard, (req, res, next) => { const id = req.session.user.id; req.session.destroy((err) => { if (err) return next(err); audit('logout', req, id).catch(() => {}); res.clearCookie('sv.sid'); res.redirect('/login'); }); });
+registerAccessTokenRoutes(app, { requireAuth, csrfGuard });
 
 app.get('/notes', requireAuth, async (req, res, next) => { try { const result = await query('SELECT id,title,content_encrypted,created_at,updated_at FROM notes WHERE owner_id=$1 ORDER BY updated_at DESC', [req.session.user.id]); const notes = result.rows.map((n) => ({ ...n, content: decrypt(n.content_encrypted) })); res.render('notes', { title: 'Mis notas', notes }); } catch (e) { next(e); } });
 app.post('/notes', requireAuth, csrfGuard, validate(noteSchema), async (req, res, next) => { try { const n = req.validated; await query('INSERT INTO notes(owner_id,title,content_encrypted) VALUES($1,$2,$3)', [req.session.user.id, n.title, encrypt(n.content)]); flash(req, 'success', 'Nota guardada cifrada correctamente.'); res.redirect('/notes'); } catch (e) { next(e); } });
