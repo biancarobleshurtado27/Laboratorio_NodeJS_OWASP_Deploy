@@ -10,6 +10,18 @@ Aplicación web de notas privadas para el laboratorio de seguridad Node.js. Incl
 - Recuperación con token aleatorio de un único uso; la BD guarda solo SHA-256 del token.
 - Bitácora JSON de eventos de seguridad, rate limiting y bloqueo progresivo.
 
+## Estructura del proyecto
+
+```
+backend/       # Servidor Express, base de datos, criptografía y pruebas
+  src/
+  test/
+frontend/      # Vistas EJS y estilos CSS de la interfaz
+  views/
+  public/
+docs/          # Informes, investigación y guion de demostración
+```
+
 ## Ejecución local
 
 1. Copia `.env.example` a `.env` y completa los valores.

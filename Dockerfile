@@ -3,9 +3,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
-COPY --chown=node:node src ./src
-COPY --chown=node:node views ./views
-COPY --chown=node:node public ./public
+COPY --chown=node:node backend ./backend
+COPY --chown=node:node frontend ./frontend
 USER node
 EXPOSE 3000
-CMD ["node", "src/server.js"]
+CMD ["node", "backend/src/server.js"]

@@ -19,10 +19,10 @@ if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.len
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', 'views'));
+app.set('views', path.join(__dirname, '..', '..', 'frontend', 'views'));
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, hsts: production ? undefined : false }));
 app.use(express.urlencoded({ extended: false, limit: '12kb' }));
-app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: production ? '1d' : 0, index: false }));
+app.use(express.static(path.join(__dirname, '..', '..', 'frontend', 'public'), { maxAge: production ? '1d' : 0, index: false }));
 app.use(session({
   store: new pgSession({ pool, tableName: 'session', createTableIfMissing: true }),
   secret: process.env.SESSION_SECRET || 'development-only-change-me-please-32chars',
