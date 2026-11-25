@@ -74,6 +74,10 @@ UPDATE users SET role = 'admin' WHERE email = 'correo-del-admin@ejemplo.com';
 
 No publiques credenciales de prueba en este README; entrégalas al docente por un canal privado. Las instancias gratis de Render se suspenden tras inactividad y sus discos son efímeros, por eso PostgreSQL externo es obligatorio.
 
+## Despliegue en Railway + PostgreSQL
+
+Railway detecta el `Dockerfile`, ejecuta la migración mediante `railway.json` y comprueba `/health`. La guía completa, con los secretos necesarios, creación de PostgreSQL privado y dominio HTTPS, está en [docs/RAILWAY-DEPLOY.md](docs/RAILWAY-DEPLOY.md).
+
 ## Verificación de seguridad
 
 ```powershell

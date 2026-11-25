@@ -14,12 +14,13 @@ function isAllowedOrigin(origin, expectedOrigin, allowLocalhost = false) {
 
 function restrictOrigin(expectedOrigin, allowLocalhost = false) {
   return (req, res, next) => {
+    const allowedOrigin = typeof expectedOrigin === 'function' ? expectedOrigin(req) : expectedOrigin;
     const origin = req.get('origin');
-    if (!isAllowedOrigin(origin, expectedOrigin, allowLocalhost)) {
+    if (!isAllowedOrigin(origin, allowedOrigin, allowLocalhost)) {
       return res.status(403).type('text/plain').send('Origin not allowed.');
     }
     if (origin) {
-      res.set('Access-Control-Allow-Origin', expectedOrigin);
+      res.set('Access-Control-Allow-Origin', allowedOrigin);
       res.set('Vary', 'Origin');
     }
     next();

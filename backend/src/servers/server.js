@@ -25,16 +25,17 @@ const log = pino({ level: process.env.LOG_LEVEL || 'info', redact: ['req.headers
 const production = process.env.NODE_ENV === 'production';
 if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) throw new Error('A 32+ character SESSION_SECRET is required in production');
 if (production && (!process.env.ACCESS_TOKEN_SECRET || process.env.ACCESS_TOKEN_SECRET.length < 32)) throw new Error('A 32+ character ACCESS_TOKEN_SECRET is required in production');
-if (production && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production');
-const appOrigin = process.env.APP_ORIGIN || `http://localhost:${process.env.PORT || 3000}`;
+const appOrigin = process.env.APP_ORIGIN;
 app.set('trust proxy', production ? 1 : false);
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', pagesPath);
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, referrerPolicy: { policy: 'no-referrer' }, hsts: production ? undefined : false }));
 // In development Chrome may use localhost aliases that vary by machine. CSRF tokens still protect forms locally.
-// Production always enforces the configured public origin.
-if (production) app.use(restrictOrigin(appOrigin));
+// In production APP_ORIGIN fixes the one public origin. During the first Railway
+// deploy there is no generated domain yet, so use the request's own origin until
+// the generated HTTPS URL is saved as APP_ORIGIN.
+if (production) app.use(restrictOrigin((req) => appOrigin || `${req.protocol}://${req.get('host')}`));
 app.use(express.urlencoded({ extended: false, limit: '12kb', parameterLimit: 20 }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false, skip: (req) => req.path === '/health', handler: (_req, res) => res.status(429).type('text/plain').send('Too many requests. Try again later.') }));
 app.use('/styles', express.static(staticPath, { maxAge: production ? '1d' : 0, index: false }));
