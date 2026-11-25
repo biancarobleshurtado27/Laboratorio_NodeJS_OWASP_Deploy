@@ -27,7 +27,7 @@ Límites de negocio: título máximo 120 caracteres, nota máxima 5,000 caracter
 | A06 Insecure Design | STRIDE, límites y abusos documentados arriba. | Este informe y diagrama de flujo. |
 | A07 Authentication Failures | Rate limit 429, bloqueo progresivo, sesión 30 min y regeneración. | Seis intentos producen 429. |
 | A08 Integrity Failures | Lockfile, CI previo al deploy, dependencias mínimas; no deserialización insegura. | Ejecución verde de GitHub Actions. |
-| A09 Logging/Alerting | Pino estructurado, redacción de password/token y bitácora admin. | Logs JSON sin secretos y panel admin. |
+| A09 Logging/Alerting | Pino estructurado, redacción de password/token, bitácora admin y evento `login_failure_alert` al tercer fallo consecutivo. | Logs JSON sin secretos y panel admin. |
 | A10 Exceptional Conditions | Manejador global, `unhandledRejection`, timeouts PG y respuesta genérica. | Error forzado: 500 sin stack trace; detalle solo en log. |
 
 ## Decisiones criptográficas y rotación
