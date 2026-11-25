@@ -68,7 +68,7 @@ app.post('/register', csrfGuard, validate(registerSchema), async (req, res, next
   catch (error) { if (error.code === '23505') { flash(req, 'error', 'No fue posible crear la cuenta con esos datos.'); return res.redirect('/register'); } next(error); }
 });
 app.get('/login', (_req, res) => res.render('login', { title: 'Iniciar sesión' }));
-app.post('/demo-login', csrfGuard, async (req, res, next) => {
+app.post('/demo-login', async (req, res, next) => {
   if (production) return res.status(404).render('error', { title: 'No encontrada', message: 'La página solicitada no existe.' });
   try {
     const result = await query("SELECT id,email,name,role FROM users WHERE email='admin@umbrafiction.example'");
