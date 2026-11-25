@@ -20,7 +20,7 @@ Límites de negocio: título máximo 120 caracteres, nota máxima 5,000 caracter
 | Categoría | Mitigación | Evidencia a capturar durante la demo |
 |---|---|---|
 | A01 Broken Access Control | `ownedNote` filtra por `id` y `owner_id`; `requireAdmin` valida rol servidor. | Usuario A abre ID de B: 404 y evento `access_denied`. |
-| A02 Security Misconfiguration | Helmet/CSP, `x-powered-by` desactivado, errores genéricos, secretos externos. | Cabeceras en producción y resultado SecurityHeaders. |
+| A02 Security Misconfiguration | Helmet/CSP/HSTS en producción, `x-powered-by` desactivado, origen restringido, no-cache autenticado, errores genéricos y secretos externos. | Cabeceras en producción y resultado SecurityHeaders. |
 | A03 Supply Chain | `package-lock.json`, `npm ci`, `npm audit --omit=dev`; CI. | Salida de audit y workflow. |
 | A04 Cryptographic Failures | bcrypt 12, AES-256-GCM con IV único, TLS y cookies Secure. | Hash `$2b$` y ciphertext `iv.tag.datos` en BD. |
 | A05 Injection | Zod en todas las entradas, parámetros `$1`, EJS escapa salida y CSP. | `OR 1=1`/script no alteran consultas ni ejecutan JS. |

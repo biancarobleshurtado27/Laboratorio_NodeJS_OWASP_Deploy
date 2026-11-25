@@ -14,6 +14,7 @@ const { registerSchema, loginSchema, noteSchema, passwordSchema, emailSchema, ro
 const { validate } = require('../middleware/validation');
 const { registerHealthRoutes } = require('../routes/health.routes');
 const { notFound, errorHandler } = require('../middleware/error-handler');
+const { restrictOrigin, noStoreAuthenticatedPages } = require('../middleware/request-security');
 const { pagesPath, staticPath } = require('../../../frontend/src/servers/view-paths');
 const { createViewContext } = require('../../../frontend/src/context/view-context');
 
@@ -21,15 +22,20 @@ const app = express();
 const log = pino({ level: process.env.LOG_LEVEL || 'info', redact: ['req.headers.authorization', 'password', 'token', '*.password', '*.token'] });
 const production = process.env.NODE_ENV === 'production';
 if (production && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) throw new Error('A 32+ character SESSION_SECRET is required in production');
-app.set('trust proxy', 1);
+if (production && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production');
+const appOrigin = process.env.APP_ORIGIN || `http://localhost:${process.env.PORT || 3000}`;
+app.set('trust proxy', production ? 1 : false);
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', pagesPath);
-app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, hsts: production ? undefined : false }));
-app.use(express.urlencoded({ extended: false, limit: '12kb' }));
+app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, referrerPolicy: { policy: 'no-referrer' }, hsts: production ? undefined : false }));
+app.use(restrictOrigin(appOrigin));
+app.use(express.urlencoded({ extended: false, limit: '12kb', parameterLimit: 20 }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false, skip: (req) => req.path === '/health', handler: (_req, res) => res.status(429).type('text/plain').send('Too many requests. Try again later.') }));
 app.use('/styles', express.static(staticPath, { maxAge: production ? '1d' : 0, index: false }));
 app.use(session({
   store: new pgSession({ pool, tableName: 'session', createTableIfMissing: true }),
+  name: 'sv.sid',
   secret: process.env.SESSION_SECRET || 'development-only-change-me-please-32chars',
   resave: false, saveUninitialized: false,
   cookie: { httpOnly: true, secure: production, sameSite: 'lax', maxAge: 1000 * 60 * 30 }
@@ -48,6 +54,7 @@ function requireAdmin(req, res, next) { if (!req.session.user || req.session.use
 function maskPhone(value) { if (!value) return 'No registrado'; const digits = value.replace(/\D/g, ''); return digits.length < 4 ? '***' : `***-***-${digits.slice(-4)}`; }
 
 app.use(csrf);
+app.use(noStoreAuthenticatedPages);
 app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); res.locals.isDevelopment = !production; delete req.session.flash; next(); });
 registerHealthRoutes(app);
 app.get('/', (req, res) => res.redirect(req.session.user ? '/notes' : '/login'));
