@@ -48,7 +48,7 @@ function requireAdmin(req, res, next) { if (!req.session.user || req.session.use
 function maskPhone(value) { if (!value) return 'No registrado'; const digits = value.replace(/\D/g, ''); return digits.length < 4 ? '***' : `***-***-${digits.slice(-4)}`; }
 
 app.use(csrf);
-app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); delete req.session.flash; next(); });
+app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); res.locals.isDevelopment = !production; delete req.session.flash; next(); });
 registerHealthRoutes(app);
 app.get('/', (req, res) => res.redirect(req.session.user ? '/notes' : '/login'));
 app.get('/register', (_req, res) => res.render('register', { title: 'Crear cuenta' }));
@@ -57,6 +57,15 @@ app.post('/register', csrfGuard, validate(registerSchema), async (req, res, next
   catch (error) { if (error.code === '23505') { flash(req, 'error', 'No fue posible crear la cuenta con esos datos.'); return res.redirect('/register'); } next(error); }
 });
 app.get('/login', (_req, res) => res.render('login', { title: 'Iniciar sesión' }));
+app.post('/demo-login', csrfGuard, async (req, res, next) => {
+  if (production) return res.status(404).render('error', { title: 'No encontrada', message: 'La página solicitada no existe.' });
+  try {
+    const result = await query("SELECT id,email,name,role FROM users WHERE email='admin@umbrafiction.example'");
+    const user = result.rows[0];
+    if (!user) return res.status(503).render('error', { title: 'Demo no disponible', message: 'Inicia los servicios Docker para crear la cuenta de demostración.' });
+    req.session.regenerate((err) => { if (err) return next(err); req.session.user = user; audit('demo_login', req, user.id).catch(next); res.redirect('/notes'); });
+  } catch (error) { next(error); }
+});
 const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false, message: 'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.', handler: (req, res) => { audit('login_rate_limited', req).catch(() => {}); res.status(429).render('error', { title: 'Demasiados intentos', message: 'Por seguridad, espera 15 minutos antes de intentarlo de nuevo.' }); } });
 app.post('/login', loginLimit, csrfGuard, validate(loginSchema), async (req, res, next) => {
   try { const { email, password } = req.validated; const result = await query('SELECT id,email,name,password_hash,role,failed_logins,locked_until FROM users WHERE email=$1', [email.toLowerCase()]); const user = result.rows[0]; const locked = user?.locked_until && new Date(user.locked_until) > new Date(); const valid = user && !locked && await bcrypt.compare(password, user.password_hash); if (!valid) { if (user) { const failures = user.failed_logins + 1; const lockUntil = failures >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null; await query('UPDATE users SET failed_logins=$1, locked_until=$2 WHERE id=$3', [failures, lockUntil, user.id]); await audit('login_failed', req, user.id, null, { locked: Boolean(lockUntil) }); } else await audit('login_failed', req); flash(req, 'error', 'Correo o contraseña inválidos.'); return res.redirect('/login'); }
