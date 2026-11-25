@@ -1,11 +1,21 @@
-function isAllowedOrigin(origin, expectedOrigin) {
-  return !origin || origin === expectedOrigin;
+function isAllowedOrigin(origin, expectedOrigin, allowLocalhost = false) {
+  if (!origin || origin === expectedOrigin) return true;
+  if (!allowLocalhost) return false;
+  try {
+    const received = new URL(origin);
+    const expected = new URL(expectedOrigin);
+    const localNames = new Set(['localhost', '127.0.0.1', '[::1]']);
+    return received.protocol === expected.protocol
+      && received.port === expected.port
+      && localNames.has(received.hostname)
+      && localNames.has(expected.hostname);
+  } catch (_error) { return false; }
 }
 
-function restrictOrigin(expectedOrigin) {
+function restrictOrigin(expectedOrigin, allowLocalhost = false) {
   return (req, res, next) => {
     const origin = req.get('origin');
-    if (!isAllowedOrigin(origin, expectedOrigin)) {
+    if (!isAllowedOrigin(origin, expectedOrigin, allowLocalhost)) {
       return res.status(403).type('text/plain').send('Origin not allowed.');
     }
     if (origin) {
