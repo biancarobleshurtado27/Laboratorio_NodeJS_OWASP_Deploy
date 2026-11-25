@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 process.env.DATA_ENCRYPTION_KEY = Buffer.alloc(32, 7).toString('base64');
-const { encrypt, decrypt, hashResetToken } = require('../src/crypto');
+const { encrypt, decrypt, hashResetToken } = require('../src/security/crypto');
 
 test('AES-256-GCM decrypts and uses a distinct random IV', () => {
   const first = encrypt('el alien del sótano trabaja mal');

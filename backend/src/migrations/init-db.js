@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { pool } = require('./db');
+const { pool } = require('../servers/database');
 const schema = `
 CREATE TABLE IF NOT EXISTS users (
  id BIGSERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL,

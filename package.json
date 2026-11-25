@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "description": "SecureVault - laboratorio Node.js OWASP Top 10:2025",
-  "main": "backend/src/server.js",
+  "main": "backend/src/servers/server.js",
   "scripts": {
-    "start": "node backend/src/server.js",
-    "dev": "node --watch backend/src/server.js",
+    "start": "node backend/src/servers/server.js",
+    "dev": "node --watch backend/src/servers/server.js",
     "test": "node --test backend/test/crypto.test.js",
-    "db:init": "node backend/src/init-db.js",
+    "db:init": "node backend/src/migrations/init-db.js",
     "audit:prod": "npm audit --omit=dev --audit-level=high"
   },
   "engines": { "node": ">=22.0.0" },

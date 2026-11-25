@@ -15,6 +15,13 @@ Aplicación web de notas privadas para el laboratorio de seguridad Node.js. Incl
 ```
 backend/       # Servidor Express, base de datos, criptografía y pruebas
   src/
+    migrations/ # Inicialización y futuros cambios de esquema
+    routes/     # Definición de endpoints
+    controllers/# Lógica de respuesta HTTP
+    middleware/ # Validación y manejo centralizado de errores
+    security/   # Cifrado y utilidades de seguridad
+    servers/    # Servidor Express y conexión PostgreSQL
+    validators/ # Esquemas Zod para entradas
   test/
 frontend/      # Vistas EJS y estilos CSS de la interfaz
   views/
