@@ -31,7 +31,9 @@ app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', pagesPath);
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, referrerPolicy: { policy: 'no-referrer' }, hsts: production ? undefined : false }));
-app.use(restrictOrigin(appOrigin, !production));
+// In development Chrome may use localhost aliases that vary by machine. CSRF tokens still protect forms locally.
+// Production always enforces the configured public origin.
+if (production) app.use(restrictOrigin(appOrigin));
 app.use(express.urlencoded({ extended: false, limit: '12kb', parameterLimit: 20 }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false, skip: (req) => req.path === '/health', handler: (_req, res) => res.status(429).type('text/plain').send('Too many requests. Try again later.') }));
 app.use('/styles', express.static(staticPath, { maxAge: production ? '1d' : 0, index: false }));
