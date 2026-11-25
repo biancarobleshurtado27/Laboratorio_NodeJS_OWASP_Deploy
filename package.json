@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node backend/src/servers/server.js",
     "dev": "node --watch backend/src/servers/server.js",
-    "test": "node --test backend/test/crypto.test.js",
+    "test": "node --test backend/test/*.test.js",
     "db:init": "node backend/src/migrations/init-db.js",
     "db:seed": "node backend/src/migrations/seed-demo.js",
     "audit:prod": "npm audit --omit=dev --audit-level=high"
