@@ -1,0 +1,28 @@
+{
+  "name": "securevault-owasp-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SecureVault - laboratorio Node.js OWASP Top 10:2025",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "db:init": "node src/init-db.js",
+    "audit:prod": "npm audit --omit=dev --audit-level=high"
+  },
+  "engines": { "node": ">=22.0.0" },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.1",
+    "pino": "^9.5.0",
+    "zod": "^4.6.7"
+  }
+}

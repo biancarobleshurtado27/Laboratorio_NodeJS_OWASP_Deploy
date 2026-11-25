@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: securevault
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run audit:prod
+    startCommand: npm run db:init && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_SSL
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
