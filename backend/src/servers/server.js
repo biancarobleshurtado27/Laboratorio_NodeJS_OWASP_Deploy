@@ -1,4 +1,13 @@
 require('dotenv').config();
+console.info(JSON.stringify({
+  event: 'securevault_bootstrap',
+  nodeEnv: process.env.NODE_ENV || 'development',
+  port: process.env.PORT || '3000',
+  hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+  hasSessionSecret: Boolean(process.env.SESSION_SECRET),
+  hasAccessTokenSecret: Boolean(process.env.ACCESS_TOKEN_SECRET),
+  hasDataEncryptionKey: Boolean(process.env.DATA_ENCRYPTION_KEY)
+}));
 const path = require('node:path');
 const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
