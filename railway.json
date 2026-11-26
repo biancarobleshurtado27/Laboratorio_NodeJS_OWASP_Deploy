@@ -6,6 +6,7 @@
   },
   "deploy": {
     "preDeployCommand": ["npm run db:init"],
+    "startCommand": "node backend/src/servers/server.js",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
