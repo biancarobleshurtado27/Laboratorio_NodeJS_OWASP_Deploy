@@ -40,6 +40,9 @@ app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', pagesPath);
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, referrerPolicy: { policy: 'no-referrer' }, hsts: production ? undefined : false }));
+// Health must remain independent from sessions and database access so the
+// deployment platform can verify that the HTTP server is reachable.
+registerHealthRoutes(app);
 // In development Chrome may use localhost aliases that vary by machine. CSRF tokens still protect forms locally.
 // In production APP_ORIGIN fixes the one public origin. During the first Railway
 // deploy there is no generated domain yet, so use the request's own origin until
@@ -71,7 +74,6 @@ function maskPhone(value) { if (!value) return 'No registrado'; const digits = v
 app.use(csrf);
 app.use(noStoreAuthenticatedPages);
 app.use((req, res, next) => { res.locals.user = req.session.user || null; res.locals.flash = req.session.flash; res.locals.viewContext = createViewContext(); res.locals.formatDateTime = formatDateTime; res.locals.isDevelopment = !production; delete req.session.flash; next(); });
-registerHealthRoutes(app);
 app.get('/', (req, res) => res.redirect(req.session.user ? '/notes' : '/login'));
 app.get('/register', (_req, res) => res.render('register', { title: 'Crear cuenta' }));
 app.post('/register', csrfGuard, validate(registerSchema), async (req, res, next) => {
