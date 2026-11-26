@@ -16,10 +16,12 @@ function restrictOrigin(expectedOrigin, allowLocalhost = false) {
   return (req, res, next) => {
     const allowedOrigin = typeof expectedOrigin === 'function' ? expectedOrigin(req) : expectedOrigin;
     const origin = req.get('origin');
-    // Browser address-bar navigations may send Origin: null. They are safe for
-    // read-only pages; all state-changing requests remain origin-checked and
-    // additionally require the CSRF token.
-    if (origin === 'null' && ['GET', 'HEAD'].includes(req.method)) return next();
+    // Browser address-bar navigation may carry a null origin. All state-changing
+    // routes additionally verify a per-session CSRF token, so null does not
+    // receive CORS access and cannot bypass the form-token protection.
+    const safeExtensionNavigation = typeof origin === 'string' && origin.startsWith('chrome-extension://');
+    if (origin === 'null') return next();
+    if (['GET', 'HEAD'].includes(req.method) && safeExtensionNavigation) return next();
     if (!isAllowedOrigin(origin, allowedOrigin, allowLocalhost)) {
       return res.status(403).type('text/plain').send('Origin not allowed.');
     }

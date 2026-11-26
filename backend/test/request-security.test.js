@@ -27,15 +27,15 @@ test('resuelve el origen de Railway durante el primer despliegue', () => {
   assert.equal(headers['Access-Control-Allow-Origin'], 'https://securevault.up.railway.app');
 });
 
-test('permite navegacion de solo lectura con Origin nulo, pero no escrituras', () => {
+test('permite Origin nulo con CSRF posterior, pero bloquea escrituras de extensiones', () => {
   const middleware = restrictOrigin('https://securevault.up.railway.app');
-  const req = { method: 'GET', get: () => 'null' };
+  const req = { method: 'POST', get: () => 'null' };
   const res = { status: () => res, type: () => res, send: () => { throw new Error('La lectura no debió bloquearse'); } };
   let continued = false;
   middleware(req, res, () => { continued = true; });
   assert.equal(continued, true);
 
-  const writeReq = { method: 'POST', get: () => 'null' };
+  const writeReq = { method: 'POST', get: () => 'chrome-extension://intermediario' };
   let status;
   const writeRes = { status: (code) => { status = code; return writeRes; }, type: () => writeRes, send: () => {} };
   middleware(writeReq, writeRes, () => { throw new Error('La escritura no debió continuar'); });
