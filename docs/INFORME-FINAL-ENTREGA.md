@@ -23,6 +23,7 @@ El desarrollo abarcó:
 2. **Fase 1 y 2 - Arquitectura y Desarrollo Seguro**: Implementación de los 8 requisitos funcionales (RF-01 a RF-08) y mitigación demostrable de las 10 categorías de **OWASP Top 10:2025**.
 3. **Fase 3 - Despliegue en Producción**: Puesta en marcha en **Railway** utilizando contenedores Docker, base de datos gestionada **PostgreSQL**, certificados TLS automáticos y gestión de secretos fuera del código fuente.
 4. **Fase 4 - Verificación y Pruebas**: Suite de pruebas automatizadas con `node:test`, auditoría de dependencias (`npm audit`) sin vulnerabilidades altas/críticas y validación manual de ataques bloqueados.
+5. **Experiencia de Usuario Profesional (Obsidian Cipher)**: Integración de un sistema de diseño UI moderno y sofisticado en modo oscuro, con tipografía técnica (*Plus Jakarta Sans*, *JetBrains Mono*), iconografía outline y microinteracciones fluidas.
 
 ---
 
@@ -46,10 +47,10 @@ El desarrollo abarcó:
 | Categoría OWASP | Mitigación Implementada | Evidencia Verificable |
 |---|---|---|
 | **A01: Broken Access Control (incluye SSRF)** | Cada consulta SQL a notas incluye la cláusula estricta `WHERE id = $1 AND owner_id = $2`. Si un usuario intenta acceder al ID de nota de otro, el sistema deniega el acceso por defecto. Sin peticiones HTTP salientes (superficie SSRF eliminada). | Si el usuario B intenta abrir la nota del usuario A (`/notes/:id/edit`), el sistema devuelve **404 / 403** y registra el evento `access_denied` en la bitácora. |
-| **A02: Security Misconfiguration** | Cabeceras de seguridad HTTP configuradas con `helmet` (CSP, HSTS, X-Content-Type-Options, Frameguard). Desactivación de `X-Powered-By`. Configuración `app.set('trust proxy', 1)`. `NODE_ENV=production`. Sin stack traces expuestos al cliente. | Encabezados validados en Railway; calificación **A** en SecurityHeaders; ausencia de cabeceras reveladoras de Express. |
+| **A02: Security Misconfiguration** | Cabeceras de seguridad HTTP configuradas con `helmet` (CSP con dominios seguros, HSTS, X-Content-Type-Options, Frameguard). Desactivación de `X-Powered-By`. Configuración `app.set('trust proxy', 1)`. `NODE_ENV=production`. Sin stack traces expuestos al cliente. | Encabezados validados en Railway; calificación **A** en SecurityHeaders; ausencia de cabeceras reveladoras de Express. |
 | **A03: Software Supply Chain Failures** | Fijación estricta de dependencias mediante `package-lock.json`. Instalación reproducible con `npm ci`. Reducción al mínimo de librerías externas. | Ejecución de `npm run audit:prod` con **0 vulnerabilidades altas o críticas**. |
 | **A04: Cryptographic Failures** | Contraseñas con **Bcrypt** ($cost = 12$). Notas y teléfono con cifrado autenticado **AES-256-GCM** (IV aleatorio de 12 bytes por registro + Authentication Tag de 16 bytes). Tokens con SHA-256. Llaves fuera de Git. Tráfico bajo **TLS 1.2/1.3**. Cookies con bandera `Secure`. | En la base de datos PostgreSQL, las contraseñas inician con `$2b$12$` y las notas se almacenan como `iv.tag.ciphertext` en Base64. |
-| **A05: Injection (incluye XSS)** | Consultas 100% parametrizadas en PostgreSQL (`$1, $2, ...`). Validación de esquema previa con Zod. Escape automático contextual de salida HTML mediante EJS. Política CSP que prohíbe scripts inline. | La inyección SQL `' OR 1=1 --` es rechazada por el validador de correo y neutralizada por el driver `pg`. Inyecciones XSS como `<script>alert(1)</script>` se renderizan como texto inofensivo. |
+| **A05: Injection (incluye XSS)** | Consultas 100% parametrizadas en PostgreSQL (`$1, $2, ...`). Validación de esquema previa con Zod. Escape automático contextual de salida HTML mediante EJS. Política CSP que prohíbe scripts inline maliciosos. | La inyección SQL `' OR 1=1 --` es rechazada por el validador de correo y neutralizada por el driver `pg`. Inyecciones XSS como `<script>alert(1)</script>` se renderizan como texto inofensivo. |
 | **A06: Insecure Design** | Modelo de amenazas STRIDE aplicado desde el diseño. Límites de negocio estrictos: título máximo 120 caracteres, nota máxima 5.000 caracteres, cuerpo HTTP limitado a 12 KB. | Esquemas de validación Zod y límites de tamaño de payload en `express.json()` y `express.urlencoded()`. |
 | **A07: Authentication Failures** | Rate limiting progresivo en endpoint de autenticación (`express-rate-limit`: 5 intentos por ventana de 15 minutos). Regeneración obligatoria de Session ID tras login (`req.session.regenerate`). Expiración de sesión (30 min) y mensajes de error genéricos que no indican si falló el correo o la clave. | 6 intentos fallidos devuelven código **HTTP 429 Too Many Requests** y generan alerta de seguridad. |
 | **A08: Software or Data Integrity Failures** | Cero deserialización de objetos no confiables. Tokens JWT con firma de algoritmo fijo (HS256). Pipeline automatizado de Integración Continua (CI) en GitHub Actions que ejecuta suite de pruebas y auditoría antes de despliegue. | Workflow de CI en `.github/workflows/ci.yml` ejecutando `npm ci`, `npm test` y `npm audit` exitosamente. |
@@ -121,7 +122,7 @@ Uno de los pilares del laboratorio fue aplicar la distinción fundamental entre 
  ┌──────────────────────────────────────────────┐
  │          Contenedor Docker (Node.js)         │
  │  - Framework Express + Helmet + CORS         │
- │  - Variables de entorno (Secretos en memoria)│
+ │  - UI Obsidian Cipher (Tailwind + Inter)     │
  │  - Rate Limiter + Zod + Criptografía nativa  │
  └──────────────────────┬───────────────────────┘
                         │
@@ -178,6 +179,7 @@ Para la evaluación práctica o video demostrativo, se estructuró la ejecución
 2. **Auditoría de Dependencias:** `npm audit --omit=dev --audit-level=high` reporta **cero vulnerabilidades**.
 3. **Control de Código Fuente:** Repositorio Git limpio con `.gitignore` que previene cualquier subida de `.env` o archivos de configuración local.
 4. **Disponibilidad:** El endpoint `/health` de Railway responde con código 200 de forma continua.
+5. **Calidad de Interfaz:** Cumplimiento total de la guía de estilo *Obsidian Cipher* (diseño limpio, responsivo y adaptativo para auditorías técnicas).
 
 ---
 
@@ -186,7 +188,8 @@ Para la evaluación práctica o video demostrativo, se estructuró la ejecución
 * **Página Web en Producción:** [https://securevault-production-583c1b9d.up.railway.app](https://securevault-production-583c1b9d.up.railway.app)
 * **Repositorio de Código:** [https://github.com/biancarobleshurtado27/Laboratorio_NodeJS_OWASP_Deploy](https://github.com/biancarobleshurtado27/Laboratorio_NodeJS_OWASP_Deploy)
 * **Documentación Complementaria en Repositorio:**
+  - `docs/INFORME-FINAL-ENTREGA.md` (Documento maestro para entrega)
+  - `docs/GUIA-ENTREGA-CAPTURAS.md` (Guía de capturas de pantalla y respuestas específicas)
   - `docs/DEEP-RESEARCH.md` (Investigación comparativa de plataformas y conceptos teóricos)
   - `docs/SECURITY-REPORT.md` (Detalle de mitigaciones OWASP y decisiones criptográficas)
-  - `docs/GUIA-ENTREGA-CAPTURAS.md` (Guía de capturas de pantalla y respuestas específicas)
   - `docs/DEMO-SCRIPT.md` (Guion para la demostración de 10 minutos)
