@@ -1,1 +1,68 @@
-<%- include('partials/header') %><section class="split"><div><h1>Mis notas</h1><p>El contenido se cifra con AES-256-GCM antes de guardarse.</p><% if (!notes.length) { %><p class="empty">Todavía no hay notas.</p><% } %><% notes.forEach(note => { %><article class="note"><h2><%= note.title %></h2><p><%= note.content %></p><small>Actualizada: <%= formatDateTime(note.updated_at) %></small><div><a class="button secondary" href="/notes/<%= note.id %>/edit">Editar</a><form class="inline" action="/notes/<%= note.id %>/delete" method="post"><input type="hidden" name="csrfToken" value="<%= csrfToken %>"><button class="danger">Eliminar</button></form></div></article><% }) %></div><aside class="card"><h2>Nueva nota</h2><form action="/notes" method="post"><input type="hidden" name="csrfToken" value="<%= csrfToken %>"><label>Título<input name="title" maxlength="120" required></label><label>Contenido<textarea name="content" maxlength="5000" required></textarea></label><button>Guardar cifrada</button></form></aside></section><%- include('partials/footer') %>
+<%- include('partials/header') %>
+
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <div class="security-pill">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+      Cifrado en Reposo Activo (AES-256-GCM)
+    </div>
+    <h1>Bóveda de Notas Privadas</h1>
+    <p style="margin: 0;">Cada registro se almacena con un vector de inicialización único y autenticación criptográfica.</p>
+  </div>
+</div>
+
+<section class="split">
+  <div>
+    <h2>Tus Notas Confidenciales (<%= notes.length %>)</h2>
+
+    <% if (!notes.length) { %>
+      <div class="empty">
+        <svg style="width:40px;height:40px;margin-bottom:0.75rem;opacity:0.6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+        <p>No tienes notas registradas en esta bóveda todavía.</p>
+        <small>Utiliza el formulario contiguo para crear tu primer secreto protegido.</small>
+      </div>
+    <% } %>
+
+    <% notes.forEach(note => { %>
+      <article class="note">
+        <div class="note-header">
+          <h2><%= note.title %></h2>
+          <span class="note-badge">Cifrada GCM</span>
+        </div>
+        <p><%= note.content %></p>
+        <small>Última actualización: <%= formatDateTime(note.updated_at) %></small>
+
+        <div class="note-actions">
+          <a class="button secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem;" href="/notes/<%= note.id %>/edit">Editar</a>
+          <form class="inline" action="/notes/<%= note.id %>/delete" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar esta nota cifrada?');">
+            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+            <button class="danger" style="padding: 0.45rem 0.9rem; font-size: 0.85rem;">Eliminar</button>
+          </form>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+
+  <aside class="card" style="position: sticky; top: 5.5rem;">
+    <h2>Nueva Nota Segura</h2>
+    <p style="font-size: 0.88rem;">El contenido se cifra en el servidor con tu clave maestra antes de ser escrito en PostgreSQL.</p>
+
+    <form action="/notes" method="post">
+      <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+
+      <label for="title">Título del Secreto</label>
+      <input id="title" name="title" maxlength="120" placeholder="Ej. Incidente subnivel 9" required>
+
+      <label for="content">Contenido Privado</label>
+      <textarea id="content" name="content" maxlength="5000" placeholder="Escribe el secreto aquí..." required></textarea>
+
+      <button class="full-width" style="margin-top: 1.25rem;">
+        🔒 Guardar Cifrada
+      </button>
+    </form>
+  </aside>
+</section>
+
+<%- include('partials/footer') %>

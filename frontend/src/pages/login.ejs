@@ -1,1 +1,40 @@
-<%- include('partials/header') %><section class="card narrow"><h1>Iniciar sesión</h1><p>Accede a tu bóveda privada.</p><form action="/login" method="post"><input type="hidden" name="csrfToken" value="<%= csrfToken %>"><label>Correo<input type="email" name="email" autocomplete="email" required></label><label>Contraseña<input type="password" name="password" autocomplete="current-password" required></label><button>Entrar</button></form><% if (isDevelopment) { %><form action="/demo-login" method="post" class="demo-login"><input type="hidden" name="csrfToken" value="<%= csrfToken %>"><button type="submit" class="secondary">Acceso rápido de demostración</button></form><p class="hint">Disponible únicamente en desarrollo local.</p><% } %><p><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p><p>¿No tienes cuenta? <a href="/register">Regístrate</a></p></section><%- include('partials/footer') %>
+<%- include('partials/header') %>
+
+<section class="card narrow">
+  <div class="security-pill">
+    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd"></path></svg>
+    Autenticación Segura
+  </div>
+
+  <h1>Iniciar Sesión</h1>
+  <p class="lead">Accede a tu bóveda privada cifrada de UmbraFiction.</p>
+
+  <form action="/login" method="post">
+    <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+
+    <label for="email">Correo Corporativo</label>
+    <input type="email" id="email" name="email" placeholder="usuario@umbrafiction.example" autocomplete="email" required>
+
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" name="password" placeholder="••••••••••••" autocomplete="current-password" required>
+
+    <button class="full-width" type="submit">
+      Ingresar a la Bóveda
+    </button>
+  </form>
+
+  <% if (isDevelopment) { %>
+    <form action="/demo-login" method="post" style="margin-top: 1.25rem;">
+      <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+      <button type="submit" class="secondary full-width">⚡ Acceso Rápido de Demostración</button>
+    </form>
+    <p class="hint">Disponible únicamente en desarrollo local.</p>
+  <% } %>
+
+  <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 0.9rem;">
+    <p><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p>
+    <p style="margin-top: 0.5rem;">¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
