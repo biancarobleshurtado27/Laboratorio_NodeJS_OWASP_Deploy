@@ -1,8 +1,8 @@
 <%- include('partials/header') %>
 
-<section class="card narrow">
+<section class="card narrow animate-slide-up">
   <div class="security-pill">
-    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
     Datos de Usuario y Enmascaramiento
   </div>
 
@@ -24,13 +24,13 @@
     <dt>Rol Actual</dt>
     <dd>
       <span class="brand-badge" style="background: <%= user.role === 'admin' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)' %>; color: <%= user.role === 'admin' ? '#fbbf24' : '#60a5fa' %>;">
-        <%= user.role === 'admin' ? '🛡️ Administrador' : '👤 Usuario Bóveda' %>
+        <%= user.role === 'admin' ? 'Administrador' : 'Usuario Bóveda' %>
       </span>
     </dd>
   </dl>
 
   <p class="hint">
-    🛡️ <strong>Control OWASP RF-05:</strong> El teléfono se almacena cifrado en reposo con AES-256-GCM y en la interfaz se presenta enmascarado para evitar fuga de información sensible.
+    <strong>Control OWASP RF-05:</strong> El teléfono se almacena cifrado en reposo con AES-256-GCM y en la interfaz se presenta enmascarado para evitar fuga de información sensible.
   </p>
 
   <div style="margin-top: 2rem; display: flex; gap: 1rem;">
