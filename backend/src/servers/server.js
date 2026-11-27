@@ -39,7 +39,22 @@ app.set('trust proxy', production ? 1 : false);
 app.disable('x-powered-by');
 app.set('view engine', 'ejs');
 app.set('views', pagesPath);
-app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], scriptSrc: ["'self'"], imgSrc: ["'self'", 'data:'], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, referrerPolicy: { policy: 'no-referrer' }, hsts: production ? undefined : false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'none'"]
+    }
+  },
+  referrerPolicy: { policy: 'no-referrer' },
+  hsts: production ? undefined : false
+}));
 // Health must remain independent from sessions and database access so the
 // deployment platform can verify that the HTTP server is reachable.
 registerHealthRoutes(app);
