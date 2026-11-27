@@ -1,43 +1,123 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html class="dark" lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title><%= title %> | <%= viewContext.applicationName %></title>
-  <link rel="stylesheet" href="/styles/styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#0f131c",
+            "surface-dim": "#0f131c",
+            "surface-container-lowest": "#0a0e17",
+            "surface-container-low": "#181b25",
+            "surface-container": "#1c1f29",
+            "surface-container-high": "#262a34",
+            "surface-container-highest": "#31353f",
+            "on-surface": "#dfe2ef",
+            "on-surface-variant": "#c2c6d6",
+            "outline": "#8c909f",
+            "outline-variant": "#424754",
+            "primary": "#adc6ff",
+            "on-primary": "#002e6a",
+            "primary-container": "#4d8eff",
+            "secondary": "#4cd7f6",
+            "on-secondary": "#003640",
+            "tertiary": "#4edea3",
+            "on-tertiary": "#003824",
+            "error": "#ffb4ab",
+            "error-container": "#93000a"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0f131c; color: #dfe2ef; }
+    .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  </style>
 </head>
-<body>
-<header class="app-header">
-  <div class="nav-container">
-    <a class="nav-brand" href="/">
-      <span class="nav-brand-title">SecureVault</span>
-      <span class="nav-brand-tag">PROD</span>
-    </a>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary">
 
-    <nav class="nav-links">
+<header class="fixed top-0 left-0 right-0 w-full z-50 bg-[#0f131c]/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
+  <div class="h-16 max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto flex items-center justify-between gap-4">
+    <div class="flex items-center gap-6">
+      <a class="flex items-center gap-2.5 group" href="/">
+        <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center border border-secondary/30 shadow-inner group-hover:border-secondary transition-colors">
+          <span class="material-symbols-outlined text-secondary text-[20px]">lock</span>
+        </div>
+        <span class="font-headline text-lg text-on-surface tracking-tight font-bold">SecureVault</span>
+      </a>
+
+      <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary/10 border border-tertiary/30 text-tertiary font-mono text-xs">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+        </span>
+        <span class="font-semibold">PROD</span>
+      </div>
+
       <% if (user) { %>
-        <a href="/notes" class="nav-link">Notas</a>
-        <a href="/profile" class="nav-link">Perfil</a>
-        <% if (user.role === 'admin') { %>
-          <a href="/admin" class="nav-link nav-link-admin">Administración</a>
-        <% } %>
-        <form action="/logout" method="post" style="display:inline; margin:0;">
-          <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
-          <button type="submit" class="nav-btn-exit">Cerrar Sesión</button>
-        </form>
-      <% } else { %>
-        <a href="/login" class="nav-link">Iniciar Sesión</a>
-        <a href="/register" class="nav-btn-primary">Crear Cuenta</a>
+        <nav class="hidden md:flex items-center gap-1">
+          <a class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-surface-container-high hover:text-on-surface <%= title.includes('Notas') ? 'bg-surface-container-high text-on-surface font-semibold' : 'text-on-surface-variant' %>" href="/notes">Notas</a>
+          <a class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-surface-container-high hover:text-on-surface <%= title.includes('Perfil') ? 'bg-surface-container-high text-on-surface font-semibold' : 'text-on-surface-variant' %>" href="/profile">Perfil</a>
+          <% if (user.role === 'admin') { %>
+            <a class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-amber-400 hover:bg-amber-950/40 hover:text-amber-300 <%= title.includes('Admin') ? 'bg-amber-950/50 font-semibold' : '' %>" href="/admin">Administración</a>
+          <% } %>
+        </nav>
       <% } %>
-    </nav>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary/10 border border-secondary/30 text-secondary font-mono text-xs">
+        <span class="material-symbols-outlined text-[15px]">verified_user</span>
+        <span class="tracking-wider">AES-256-GCM ACTIVE</span>
+      </div>
+
+      <% if (user) { %>
+        <div class="flex items-center gap-2 pl-2 border-l border-outline-variant/30">
+          <a href="/profile" class="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-surface-container-high transition-colors">
+            <span class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center font-mono text-xs text-primary font-bold">
+              <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
+            </span>
+            <span class="hidden sm:inline text-on-surface-variant text-sm font-medium"><%= user.name %></span>
+          </a>
+          <form action="/logout" method="post" class="inline m-0">
+            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+            <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Cerrar Sesión" type="submit">
+              <span class="material-symbols-outlined text-[20px]">logout</span>
+            </button>
+          </form>
+        </div>
+      <% } else { %>
+        <div class="flex items-center gap-2">
+          <a href="/login" class="px-3 py-1.5 rounded-lg text-on-surface-variant text-sm font-medium hover:bg-surface-container-high hover:text-on-surface transition-colors">Iniciar Sesión</a>
+          <a href="/register" class="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-container transition-all shadow-md">Crear Cuenta</a>
+        </div>
+      <% } %>
+    </div>
   </div>
 </header>
 
-<main>
+<main class="w-full pt-20 pb-12 flex-1">
   <% if (flash) { %>
-    <div class="flash <%= flash.type %>">
-      <span><%= flash.message %></span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+      <div class="p-3 rounded-lg border flex items-center gap-2.5 text-sm font-medium <%= flash.type === 'error' ? 'bg-error-container/30 border-error/40 text-error' : 'bg-tertiary/10 border-tertiary/40 text-tertiary' %>">
+        <span class="material-symbols-outlined text-[18px]"><%= flash.type === 'error' ? 'error' : 'check_circle' %></span>
+        <span><%= flash.message %></span>
+      </div>
     </div>
   <% } %>

@@ -1,41 +1,62 @@
 <%- include('partials/header') %>
 
-<section class="card narrow animate-slide-up">
-  <div class="security-pill">
-    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-    Datos de Usuario y Enmascaramiento
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="p-6 sm:p-8 bg-surface-container-low border border-outline-variant/40 rounded-xl shadow-2xl flex flex-col gap-6">
+    <!-- Header -->
+    <div class="flex items-center gap-3 pb-4 border-b border-outline-variant/30">
+      <div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-secondary/30">
+        <span class="material-symbols-outlined text-secondary text-2xl">account_circle</span>
+      </div>
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary/10 border border-tertiary/30 text-tertiary font-mono text-[11px] mb-1">
+          <span class="material-symbols-outlined text-[13px]">shield</span>
+          <span>Dato Enmascarado (RF-05)</span>
+        </div>
+        <h1 class="font-headline text-2xl font-bold text-on-surface">Mi Perfil Corporativo</h1>
+      </div>
+    </div>
+
+    <!-- Data Grid -->
+    <div class="flex flex-col gap-3 bg-surface-container-lowest p-5 rounded-lg border border-outline-variant/30 font-mono text-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-outline-variant/20 gap-1">
+        <span class="text-xs text-outline uppercase tracking-wider">Nombre Completo</span>
+        <span class="text-on-surface font-semibold"><%= profile.name %></span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-outline-variant/20 gap-1">
+        <span class="text-xs text-outline uppercase tracking-wider">Correo Electrónico</span>
+        <span class="text-on-surface"><%= profile.email %></span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-outline-variant/20 gap-1">
+        <span class="text-xs text-outline uppercase tracking-wider">Teléfono Protegido</span>
+        <span class="text-secondary font-bold tracking-widest"><%= profile.phone %></span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-1">
+        <span class="text-xs text-outline uppercase tracking-wider">Rol de Autorización</span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold <%= user.role === 'admin' ? 'bg-amber-950/40 text-amber-300 border border-amber-600/30' : 'bg-primary/10 text-primary border border-primary/30' %>">
+          <span class="material-symbols-outlined text-[14px]"><%= user.role === 'admin' ? 'admin_panel_settings' : 'person' %></span>
+          <span><%= user.role === 'admin' ? 'Administrador' : 'Usuario Bóveda' %></span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Security Hint Box -->
+    <div class="p-4 rounded-lg bg-surface-container border border-outline-variant/30 flex items-start gap-3">
+      <span class="material-symbols-outlined text-secondary text-xl mt-0.5">verified</span>
+      <div class="text-xs text-on-surface-variant leading-relaxed">
+        <strong class="text-on-surface">Cumplimiento Criptográfico:</strong> El teléfono se almacena cifrado en reposo en PostgreSQL con AES-256-GCM. La aplicación descifra el dato en memoria y aplica un enmascaramiento estricto antes de transferirlo al cliente.
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <a href="/notes" class="w-full h-10 bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs rounded-lg flex items-center justify-center gap-2 transition-colors border border-outline-variant/30">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        <span>Volver a mis notas</span>
+      </a>
+    </div>
   </div>
-
-  <h1>Mi Perfil Corporativo</h1>
-  <p class="lead">Información de tu identidad y datos protegidos en la base de datos.</p>
-
-  <dl>
-    <dt>Nombre</dt>
-    <dd><%= profile.name %></dd>
-
-    <dt>Correo</dt>
-    <dd><%= profile.email %></dd>
-
-    <dt>Teléfono</dt>
-    <dd>
-      <span style="font-family: var(--font-mono); color: #38bdf8; font-weight: 600;"><%= profile.phone %></span>
-    </dd>
-
-    <dt>Rol Actual</dt>
-    <dd>
-      <span class="brand-badge" style="background: <%= user.role === 'admin' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)' %>; color: <%= user.role === 'admin' ? '#fbbf24' : '#60a5fa' %>;">
-        <%= user.role === 'admin' ? 'Administrador' : 'Usuario Bóveda' %>
-      </span>
-    </dd>
-  </dl>
-
-  <p class="hint">
-    <strong>Control OWASP RF-05:</strong> El teléfono se almacena cifrado en reposo con AES-256-GCM y en la interfaz se presenta enmascarado para evitar fuga de información sensible.
-  </p>
-
-  <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-    <a href="/notes" class="button secondary full-width">Volver a mis notas</a>
-  </div>
-</section>
+</div>
 
 <%- include('partials/footer') %>
